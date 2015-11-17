@@ -78,7 +78,7 @@ public class Opdracht1 {
      -select count(a) from Account as a - staat zo in Account.java
     
      3.	Wat is het eindresultaat in de database?
-     -  geen rijen vanwege de rollback
+     -  geen rijen vanwege de rollback.
      */
     @Test
     public void Rollback() {
