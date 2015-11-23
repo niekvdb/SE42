@@ -203,4 +203,182 @@ public class Opdracht1 {
         assertEquals(account1.getBalance(), account2.getBalance());
 
     }
+
+    /*      
+     1.	Wat is de waarde van asserties en printstatements? Corrigeer verkeerde asserties zodat de test ‘groen’ wordt.
+     -De eerste assert returned true, de verwachte balans geset is naar 100L en ook gecommit dus staat ook in de database zo.
+     -De tweede assert returned true, account staat in de database met nummer 1L
+    
+    
+     2.	Welke SQL statements worden gegenereerd?
+     -INSERT INTO ACCOUNT (ACCOUNTNR, BALANCE, THRESHOLD) VALUES (1, 100, 0)
+     -select a from Account as a where a.accountNr = :accountNr
+     
+    
+     3.	Wat is het eindresultaat in de database?
+     -
+     */
+    @Test
+    public void mergeTest() {
+        Account acc = new Account(1L);
+        Account acc2 = new Account(2L);
+        Account acc9 = new Account(9L);
+        AccountDAOJPAImpl dao = new AccountDAOJPAImpl(em);
+
+        // scenario 1
+        Long balance1 = 100L;
+        em.getTransaction().begin();
+        em.persist(acc);
+        acc.setBalance(balance1);
+        //Hier wordt sql statement 1 uitgevoerd. Zie hierboven
+        em.getTransaction().commit();
+
+        //asserties part 1
+        assertEquals(balance1, acc.getBalance());
+        assertEquals(new Long(0), acc.getThreshold());
+        assertEquals(new Long(1), acc.getAccountNr());
+        //Hier wordt sql statement 2 uitgevoerd. Zie hierboven
+        Account found1 = dao.findByAccountNr(1L);
+        //asserties part 2
+        assertEquals(found1, acc);
+        assertEquals(balance1, acc.getBalance());
+        assertEquals(new Long(0), acc.getThreshold());
+        assertEquals(new Long(1), acc.getAccountNr());
+
+        //TODO: voeg asserties toe om je verwachte waarde van de attributen te verifieren.
+        //TODO: doe dit zowel voor de bovenstaande java objecten als voor opnieuw bij de entitymanager opgevraagde objecten met overeenkomstig Id.
+        // scenario 2
+        Long balance2a = 211L;
+        acc = new Account(10L);
+        em.getTransaction().begin();
+        acc9 = em.merge(acc);
+        acc.setBalance(balance2a);
+        acc9.setBalance(balance2a + balance2a);
+        em.getTransaction().commit();
+
+        //asserties part 1
+        assertEquals(new Long(10), acc.getAccountNr());
+        assertEquals(new Long(0), acc.getThreshold());
+        assertEquals(balance2a, acc.getBalance());
+        assertEquals(new Long(balance2a + balance2a), acc9.getBalance());
+
+        //asserties part 2
+        Account found2 = dao.findByAccountNr(acc.getAccountNr());
+        assertEquals(new Long(10), found2.getAccountNr());
+        assertEquals(new Long(0), found2.getThreshold());
+        assertEquals(new Long(balance2a + balance2a), found2.getBalance());
+        assertEquals(new Long(balance2a + balance2a), acc9.getBalance());
+        assertNotEquals(acc.getBalance(), acc9.getBalance());
+
+        //TODO: voeg asserties toe om je verwachte waarde van de attributen te verifiëren.
+        //TODO: doe dit zowel voor de bovenstaande java objecten als voor opnieuw bij de entitymanager opgevraagde objecten met overeenkomstig Id. 
+        // HINT: gebruik acccountDAO.findByAccountNr
+        // scenario 3
+        Long balance3b = 322L;
+        Long balance3c = 333L;
+        acc = new Account(3L);
+        em.getTransaction().begin();
+        Account acc3 = em.merge(acc);
+        // assertTrue(em.contains(acc)); // verklaar: acc bestaat niet meer in de database, omdat die gemerged is met acc3
+        assertTrue(em.contains(acc3));  // verklaar: acc3 heeft alle waardes van acc gekregen en bestaat nog in de database.
+        //  assertEquals(acc, acc3);  // verklaar: acc bestaat niet meer in de database, omdat die gemerged is met acc3
+        acc3.setBalance(balance3b);
+        acc.setBalance(balance3c);
+        //INSERT INTO ACCOUNT (ACCOUNTNR, BALANCE, THRESHOLD) VALUES (3, 322, 0)
+        em.getTransaction().commit();
+
+        //asserties part 1
+        Account found3 = dao.findByAccountNr(3L);
+        assertEquals(balance3b, found3.getBalance());
+
+        // scenario 4
+        Account account = new Account(114L);
+        account.setBalance(450L);
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(account);
+        //INSERT INTO ACCOUNT (ACCOUNTNR, BALANCE, THRESHOLD) VALUES (114, 450, 0)
+        em.getTransaction().commit();
+
+        Account account2 = new Account(114L);
+        Account tweedeAccountObject = account2;
+        tweedeAccountObject.setBalance(650l);
+        assertEquals((Long) 650L, account2.getBalance());  //verklaar: de twee accounts zijn in java gemerged, door tweedeAccountObject = account2;
+        account2.setId(account.getId());
+        em.getTransaction().begin();
+        account2 = em.merge(account2);
+        assertSame(account, account2);  //account en account2 hebben hetzelfde ID
+        assertTrue(em.contains(account2));  //verklaar account2 is managed door em2.
+        assertFalse(em.contains(tweedeAccountObject));   //verklaar: tweedeAccountObject is nooit in de database gezet.
+        tweedeAccountObject.setBalance(850l);
+        assertEquals((Long) 650L, account.getBalance());  //verklaar: account is met account2 in java "gemerged", hierdoor is de balans van account hetzelfde als die van account2 geworden.
+        assertEquals((Long) 650L, account2.getBalance());  //verklaar: het balans van account2 is nooit veranderd.
+        //INSERT INTO ACCOUNT (ACCOUNTNR, BALANCE, THRESHOLD) VALUES (114, 650, 0)
+        em.getTransaction().commit();
+        em.close();
+
+    }
+
+    @Test
+    public void FindAndClearTest() {
+        Account acc1 = new Account(77L);
+        em.getTransaction().begin();
+        em.persist(acc1);
+        //INSERT INTO ACCOUNT (ACCOUNTNR, BALANCE, THRESHOLD) VALUES (77, 0, 0)
+        em.getTransaction().commit();
+        //Database bevat nu een account.
+
+        // scenario 1        
+        Account accF1;
+        Account accF2;
+        accF1 = em.find(Account.class, acc1.getId());
+        accF2 = em.find(Account.class, acc1.getId());
+        assertSame(accF1, accF2);
+
+        // scenario 2        
+        accF1 = em.find(Account.class, acc1.getId());
+        //clear detached als het ware alle gemanagede entities. dus acc1 word gedetached en daardoor geeft de 2de find niet meer hetzelfde terug als de eerste
+        em.clear();
+        accF2 = em.find(Account.class, acc1.getId());
+//        assertSame(accF1, accF2);
+        //TODO verklaar verschil tussen beide scenario's
+
+        /**
+         * De veranderingen die zijn gemaakt aan de database, zijn niet
+         * geflushed. Doordat in het 2de scenario em.clear(); wordt aangeroepen,
+         * worden alle veranderingen die aan de database zijn aangebracht niet
+         * gepersisteerd.
+         */
+    }
+
+    @Test
+    public void RemoveTest() {
+        Account acc1 = new Account(88L);
+        em.getTransaction().begin();
+        em.persist(acc1);
+        //INSERT INTO ACCOUNT (ACCOUNTNR, BALANCE, THRESHOLD) VALUES (88, 0, 0)
+        em.getTransaction().commit();
+        Long id = acc1.getId();
+        //Database bevat nu een account.
+
+        em.remove(acc1);
+        assertEquals(id, acc1.getId());
+        Account accFound = em.find(Account.class, id);
+        assertNull(accFound);
+        //TODO: verklaar bovenstaande asserts
+
+        /**
+         * Het account is alleen uit de database verwijderd. Het kan dus wel in
+         * java gevonden worden, maar niet in de database. Dus de eerste assert
+         * kijkt binnen java en de tweede probeert een account te zoeken in de
+         * database
+         */
+    }
+
+    /**
+     * Opdracht 9 bij GenerationType TABLE faalde de test hoe die nu geschreven
+     * is omdat bij de andere 2 generation types de Primary key door de database
+     * wordt gegenereerd. Bij Table wordt primary key gegenereerd tijdens de
+     * persist.
+     */
 }
