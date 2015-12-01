@@ -13,6 +13,9 @@ public class User {
     @Id
     private String email;
 
+    public User() {
+    }
+
     public User(String email) {
         this.email = email;
 

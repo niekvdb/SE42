@@ -7,20 +7,33 @@ import org.junit.Before;
 import org.junit.Test;
 
 import auction.domain.User;
+import java.sql.SQLException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import org.junit.After;
 
 public class JPARegistrationMgrTest {
 
     private RegistrationMgr registrationMgr;
     private EntityManager em;
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
+    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistenceUnit");
 
     @Before
     public void setUp() throws Exception {
         em = emf.createEntityManager();
         registrationMgr = new RegistrationMgr(em);
+    }
+
+    @After
+    public void TearDown() throws SQLException {
+        DatabaseCleaner cleaner = new DatabaseCleaner(em);
+        try {
+            cleaner.clean();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
     }
 
     @Test

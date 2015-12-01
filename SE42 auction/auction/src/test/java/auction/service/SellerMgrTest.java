@@ -20,7 +20,7 @@ public class SellerMgrTest {
     private RegistrationMgr registrationMgr;
     private SellerMgr sellerMgr;
     private EntityManager em;
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
+    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistenceUnit");
 
     @Before
     public void setUp() throws Exception {
