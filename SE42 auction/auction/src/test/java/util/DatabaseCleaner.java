@@ -1,4 +1,4 @@
-package auction.service;
+package util;
 
 import auction.domain.User;
 import java.sql.SQLException;
