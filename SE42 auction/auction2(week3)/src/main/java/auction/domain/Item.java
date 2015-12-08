@@ -31,7 +31,7 @@ public class Item implements Comparable, Serializable {
 
     private String description;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "item")
     private Bid highest;
 
     public Item() {
@@ -42,6 +42,8 @@ public class Item implements Comparable, Serializable {
         this.category = category;
         this.description = description;
         this.highest = null;
+
+        this.seller.addItem(this);
     }
 
     public Long getId() {
@@ -88,7 +90,7 @@ public class Item implements Comparable, Serializable {
         if (highest != null && highest.getAmount().compareTo(amount) >= 0) {
             return null;
         }
-        highest = new Bid(buyer, amount);
+        highest = new Bid(buyer, amount, this);
         return highest;
     }
 
@@ -98,22 +100,23 @@ public class Item implements Comparable, Serializable {
     }
 
     public boolean equals(Object o) {
-        if (o == null) {
+        if (o == null || !(o instanceof Item)) {
             return false;
         }
 
-        try {
-            Item item = (Item) o;
-            if (item.getDescription().equals(this.description)) {
-                return true;
-            }
-        } catch (Exception e) {
-        }
-        return false;
+        Item item = (Item) o;
+
+        // aangezien id pas aangemaakt wordt als deze toegevoegd wordt aan de database
+        // en de andere attributen buiten de constructor geset worden (dus niet persee
+        // geinitialiseerd zijn) alleen de attributen binnen de constructor gebruikt
+        return (this.seller.equals(item.getSeller())
+                && this.category.equals(item.getCategory())
+                && this.description.equals(item.getDescription()));
     }
 
     public int hashCode() {
-        //TODO
-        return 0;
+        return this.seller.hashCode()
+                * this.category.hashCode()
+                * this.description.hashCode();
     }
 }

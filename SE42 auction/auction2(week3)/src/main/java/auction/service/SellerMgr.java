@@ -52,6 +52,7 @@ public class SellerMgr {
             EntityManager em = emf.createEntityManager();
             ItemDAO itemDAO = new ItemDAOJPAImpl(em);
 
+            //for debug
             String description = item.getDescription();
 
             em.getTransaction().begin();
