@@ -1,8 +1,13 @@
 package auction.domain;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
-public class Category implements Serializable{
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Category implements Serializable {
 
     private String description;
 
@@ -16,5 +21,9 @@ public class Category implements Serializable{
 
     public String getDiscription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

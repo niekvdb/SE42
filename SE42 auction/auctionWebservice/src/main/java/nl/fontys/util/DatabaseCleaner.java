@@ -1,11 +1,11 @@
 package nl.fontys.util;
 
-
 import auction.domain.Bid;
 import auction.domain.Item;
 import auction.domain.User;
 import java.sql.SQLException;
 import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.persistence.metamodel.EntityType;
 
 public class DatabaseCleaner {
@@ -15,7 +15,12 @@ public class DatabaseCleaner {
         User.class,
         Bid.class
     };
-    private final EntityManager em;
+    private  EntityManager em =Persistence.createEntityManagerFactory("auctionPU").createEntityManager();
+     DatabaseCleaner db;
+
+    public DatabaseCleaner() {
+        db = new DatabaseCleaner(em);
+    }
 
     public DatabaseCleaner(EntityManager entityManager) {
         em = entityManager;

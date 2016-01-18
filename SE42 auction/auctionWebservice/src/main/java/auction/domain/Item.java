@@ -7,9 +7,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import nl.fontys.util.Money;
 
+@XmlRootElement
 @Entity
+@XmlAccessorType(XmlAccessType.FIELD)
 @NamedQueries({
     @NamedQuery(name = "Item.count", query = "select count(i) from Item as i"),
     @NamedQuery(name = "Item.find", query = "select i from Item as i where i.id = :id"),
@@ -69,7 +74,18 @@ public class Item implements Comparable, Serializable {
     }
 
     public boolean equals(Object o) {
-        //TODO
+       if (o == null) {
+            return false;
+        }
+        
+        try {
+            Item item = (Item)o;
+            if (item.getDescription().equals(this.description)) {
+                return true;
+            }
+        }
+        catch (Exception e) {
+        }
         return false;
     }
 

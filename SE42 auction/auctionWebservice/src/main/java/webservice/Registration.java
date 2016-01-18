@@ -3,32 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package auction.service;
+package webservice;
 
-import auction.domain.Bid;
-import auction.domain.Category;
-import auction.domain.Item;
 import auction.domain.User;
+import auction.service.RegistrationMgr;
 import java.sql.SQLException;
-import java.util.List;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import nl.fontys.util.DatabaseCleaner;
-import nl.fontys.util.Money;
 
 /**
  *
  * @author Niek
  */
 @WebService
-public class Auction
+public class Registration
 {
-    private final AuctionMgr auctionMgr = new AuctionMgr();
-    private final SellerMgr  sellerMgr  = new SellerMgr();
-    
+    private final RegistrationMgr registrationMgr = new RegistrationMgr();
     @WebMethod
     public void cleanDatabase() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("auctionPU");
@@ -41,31 +35,20 @@ public class Auction
         catch(SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
         }
+    } 
+    
+    @WebMethod
+    public User registerUser(String email) {
+        return this.registrationMgr.registerUser(email);
     }
     
     @WebMethod
-    public Item getItem(long id) {
-        return this.auctionMgr.getItem(id);
+    public User getUser(String user) {
+        return this.registrationMgr.getUser(user);
     }
     
     @WebMethod
-    public List<Item> findItemByDescription(String description) {
-        return this.auctionMgr.findItemByDescription(description);
+    public boolean compareUser(User user1, User user2) {
+        return user1.equals(user2);
     }
-    
-    @WebMethod
-    public Bid newBid(Item item, User buyer, Money amount) {
-        return this.auctionMgr.newBid(item, buyer, amount);
-    }
-    
-    @WebMethod
-    public Item offerItem(User seller, Category category, String description) {
-        return this.sellerMgr.offerItem(seller, category, description);
-    }
-    
-    @WebMethod
-    public boolean revokeItem(Item item) {
-        return this.sellerMgr.revokeItem(item);
-    }
-
 }
