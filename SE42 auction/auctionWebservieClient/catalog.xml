@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://localhost:9090/Auction?wsdl" uri="xml-resources/web-service-references/Auction/wsdl/localhost_9090/Auction.wsdl"/>
+    <system systemId="http://localhost:9090/Auction?xsd=1" uri="xml-resources/web-service-references/Auction/wsdl/localhost_9090/Auction.xsd_1.xsd"/>
+    <system systemId="http://localhost:9091/Registration?wsdl" uri="xml-resources/web-service-references/Registration/wsdl/localhost_9091/Registration.wsdl"/>
+    <system systemId="http://localhost:9091/Registration?xsd=1" uri="xml-resources/web-service-references/Registration/wsdl/localhost_9091/Registration.xsd_1.xsd"/>
+    <system systemId="http://localhost:9092/webDatabaseCleaner?wsdl" uri="xml-resources/web-service-references/webDatabaseCleaner/wsdl/localhost_9092/webDatabaseCleaner.wsdl"/>
+    <system systemId="http://localhost:9092/webDatabaseCleaner?xsd=1" uri="xml-resources/web-service-references/webDatabaseCleaner/wsdl/localhost_9092/webDatabaseCleaner.xsd_1.xsd"/>
+    <system systemId="http://localhost:9092/DatabaseCleaner?wsdl" uri="xml-resources/web-service-references/DatabaseCleaner/wsdl/localhost_9092/DatabaseCleaner.wsdl"/>
+    <system systemId="http://localhost:9092/DatabaseCleaner?xsd=1" uri="xml-resources/web-service-references/DatabaseCleaner/wsdl/localhost_9092/DatabaseCleaner.xsd_1.xsd"/>
+</catalog>
